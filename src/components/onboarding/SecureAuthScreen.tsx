@@ -8,19 +8,32 @@ import { AuthModal } from "@/components/auth/AuthModal";
 interface SecureAuthScreenProps {
   onBack?: () => void;
   onComplete?: () => void;
+  onSelectAuth?: (mode: "signup" | "signin") => void;
 }
 
-export function SecureAuthScreen({ onBack, onComplete }: SecureAuthScreenProps) {
+export function SecureAuthScreen({
+  onBack,
+  onComplete,
+  onSelectAuth,
+}: SecureAuthScreenProps) {
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [authMode, setAuthMode] = useState<"signup" | "signin">("signup");
   const [activeDot, setActiveDot] = useState<number>(0);
 
   const handleOpenSignUp = () => {
+    if (onSelectAuth) {
+      onSelectAuth("signup");
+      return;
+    }
     setAuthMode("signup");
     setIsAuthOpen(true);
   };
 
   const handleOpenSignIn = () => {
+    if (onSelectAuth) {
+      onSelectAuth("signin");
+      return;
+    }
     setAuthMode("signin");
     setIsAuthOpen(true);
   };
