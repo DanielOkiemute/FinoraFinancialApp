@@ -4,15 +4,17 @@ import React, { useState, useEffect } from "react";
 import { MobileShell } from "@/components/layout/MobileShell";
 import { WelcomeScreen } from "@/components/onboarding/WelcomeScreen";
 import { SecureAuthScreen } from "@/components/onboarding/SecureAuthScreen";
+import { AuthScreen } from "@/components/auth/AuthScreen";
 import { DashboardOverview } from "@/components/dashboard/DashboardOverview";
 import { loadAppState, resetAppState } from "@/lib/storage/storage";
 import { FinoraAppState } from "@/types";
 
-type ScreenStage = "welcome" | "secure-auth" | "dashboard";
+type ScreenStage = "welcome" | "secure-auth" | "auth-screen" | "dashboard";
 
 export default function Home() {
   const [appState, setAppState] = useState<FinoraAppState | null>(null);
   const [currentScreen, setCurrentScreen] = useState<ScreenStage>("welcome");
+  const [authMode, setAuthMode] = useState<"signup" | "signin">("signup");
   const [isHydrated, setIsHydrated] = useState(false);
 
   useEffect(() => {
@@ -33,6 +35,15 @@ export default function Home() {
 
   const handleBackToWelcome = () => {
     setCurrentScreen("welcome");
+  };
+
+  const handleSelectAuthFromSecure = (mode: "signup" | "signin") => {
+    setAuthMode(mode);
+    setCurrentScreen("auth-screen");
+  };
+
+  const handleBackToSecure = () => {
+    setCurrentScreen("secure-auth");
   };
 
   const handleCompleteAuth = () => {
@@ -65,7 +76,16 @@ export default function Home() {
       {currentScreen === "secure-auth" && (
         <SecureAuthScreen
           onBack={handleBackToWelcome}
+          onSelectAuth={handleSelectAuthFromSecure}
           onComplete={handleCompleteAuth}
+        />
+      )}
+
+      {currentScreen === "auth-screen" && (
+        <AuthScreen
+          initialMode={authMode}
+          onBack={handleBackToSecure}
+          onSuccess={handleCompleteAuth}
         />
       )}
 

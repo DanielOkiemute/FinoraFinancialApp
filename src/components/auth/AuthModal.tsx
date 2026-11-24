@@ -18,10 +18,11 @@ export function AuthModal({
   onSuccess,
 }: AuthModalProps) {
   const [mode, setMode] = useState<"signup" | "signin">(initialMode);
-  const [displayName, setDisplayName] = useState("");
-  const [email, setEmail] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [password, setPassword] = useState("");
-  const [errors, setErrors] = useState<{ displayName?: string; email?: string; password?: string }>({});
+  const [showPassword, setShowPassword] = useState(false);
+  const [errors, setErrors] = useState<{ firstName?: string; lastName?: string; password?: string }>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Sync mode when initialMode changes or modal opens
@@ -33,22 +34,26 @@ export function AuthModal({
   if (!isOpen) return null;
 
   const validate = (): boolean => {
-    const newErrors: { displayName?: string; email?: string; password?: string } = {};
+    const newErrors: { firstName?: string; lastName?: string; password?: string } = {};
 
-    if (mode === "signup" && !displayName.trim()) {
-      newErrors.displayName = "Full name is required";
-    }
-
-    if (!email.trim()) {
-      newErrors.email = "Email address is required";
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      newErrors.email = "Please enter a valid email address";
-    }
-
-    if (!password) {
-      newErrors.password = "Password is required";
-    } else if (password.length < 6) {
-      newErrors.password = "Password must be at least 6 characters";
+    if (mode === "signup") {
+      if (!firstName.trim()) {
+        newErrors.firstName = "First name is required";
+      }
+      if (!lastName.trim()) {
+        newErrors.lastName = "Last name is required";
+      }
+      if (!password) {
+        newErrors.password = "Password is required";
+      } else if (password.length < 6) {
+        newErrors.password = "Password must be at least 6 characters";
+      }
+    } else {
+      if (!password) {
+        newErrors.password = "Password is required";
+      } else if (password.length < 4) {
+        newErrors.password = "Password must be at least 4 characters";
+      }
     }
 
     setErrors(newErrors);
@@ -64,12 +69,16 @@ export function AuthModal({
     // Simulate authenticating safely (per AGENTS.md demo rules, no real secrets stored)
     setTimeout(() => {
       const currentState = loadAppState();
+      const resolvedDisplayName =
+        mode === "signup"
+          ? `${firstName.trim()} ${lastName.trim()}`
+          : currentState.profile.displayName || "Daniel";
+
       const updatedState: FinoraAppState = {
         ...currentState,
         profile: {
           ...currentState.profile,
-          displayName: mode === "signup" ? displayName.trim() : (currentState.profile.displayName || "Alex Rivera"),
-          email: email.trim(),
+          displayName: resolvedDisplayName,
         },
         onboardingComplete: true,
       };
@@ -77,8 +86,8 @@ export function AuthModal({
       saveAppState(updatedState);
       setIsSubmitting(false);
       onSuccess({
-        displayName: updatedState.profile.displayName,
-        email: updatedState.profile.email || email,
+        displayName: resolvedDisplayName,
+        email: updatedState.profile.email || "alex.morgan@example.com",
       });
     }, 500);
   };
@@ -87,12 +96,12 @@ export function AuthModal({
     setIsSubmitting(true);
     setTimeout(() => {
       const currentState = loadAppState();
+      const resolvedDisplayName = currentState.profile.displayName || "Daniel";
       const updatedState: FinoraAppState = {
         ...currentState,
         profile: {
           ...currentState.profile,
-          displayName: currentState.profile.displayName || "Alex Rivera",
-          email: currentState.profile.email || "alex.rivera@example.com",
+          displayName: resolvedDisplayName,
         },
         onboardingComplete: true,
       };
@@ -100,8 +109,8 @@ export function AuthModal({
       saveAppState(updatedState);
       setIsSubmitting(false);
       onSuccess({
-        displayName: updatedState.profile.displayName,
-        email: updatedState.profile.email || "alex.rivera@example.com",
+        displayName: resolvedDisplayName,
+        email: updatedState.profile.email || "alex.morgan@example.com",
       });
     }, 400);
   };
@@ -117,7 +126,7 @@ export function AuthModal({
       <div className="absolute inset-0" onClick={onClose} aria-hidden="true" />
 
       {/* Modal Surface */}
-      <div className="relative z-10 w-full max-w-sm sm:max-w-md bg-white rounded-t-[32px] sm:rounded-[32px] p-6 shadow-2xl border border-slate-100 flex flex-col text-[#17142B] font-sans max-h-[90vh] overflow-y-auto">
+      <div className="relative z-10 w-full max-w-sm sm:max-w-md bg-white rounded-t-4xl sm:rounded-4xl p-6 shadow-2xl border border-slate-100 flex flex-col text-main-text font-sans max-h-[90vh] overflow-y-auto no-scrollbar scrollbar-none [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
         {/* Top Handle / Close Button */}
         <div className="w-full flex items-center justify-between pb-2">
           <div className="w-12 h-1.5 bg-slate-200 rounded-full mx-auto sm:hidden mb-2" />
@@ -135,16 +144,16 @@ export function AuthModal({
         </div>
 
         {/* Tab Switcher: Sign Up vs Sign In */}
-        <div className="flex bg-[#F5F3FF] p-1 rounded-2xl mb-5 mt-1 border border-purple-100">
+        <div className="flex bg-app-bg p-1 rounded-2xl mb-5 mt-1 border border-purple-100">
           <button
             type="button"
             onClick={() => {
               setMode("signup");
               setErrors({});
             }}
-            className={`flex-1 py-2.5 text-sm font-semibold rounded-xl transition-all duration-200 ${
+            className={`flex-1 py-2.5 text-sm font-semibold rounded-xl transition-all duration-200 cursor-pointer ${
               mode === "signup"
-                ? "bg-white text-[#4010D8] shadow-sm"
+                ? "bg-white text-primary shadow-sm"
                 : "text-slate-500 hover:text-slate-800"
             }`}
           >
@@ -156,9 +165,9 @@ export function AuthModal({
               setMode("signin");
               setErrors({});
             }}
-            className={`flex-1 py-2.5 text-sm font-semibold rounded-xl transition-all duration-200 ${
+            className={`flex-1 py-2.5 text-sm font-semibold rounded-xl transition-all duration-200 cursor-pointer ${
               mode === "signin"
-                ? "bg-white text-[#4010D8] shadow-sm"
+                ? "bg-white text-primary shadow-sm"
                 : "text-slate-500 hover:text-slate-800"
             }`}
           >
@@ -168,89 +177,111 @@ export function AuthModal({
 
         {/* Header */}
         <div className="mb-5 text-center">
-          <h2 id="auth-modal-title" className="text-2xl font-bold tracking-tight text-[#17142B]">
+          <h2 id="auth-modal-title" className="text-2xl font-bold tracking-tight text-main-text">
             {mode === "signup" ? "Create an account" : "Welcome back"}
           </h2>
           <p className="mt-1 text-xs sm:text-sm text-slate-500">
             {mode === "signup"
               ? "Experience seamless banking and smart finance tracking."
-              : "Enter your credentials to access your Finora dashboard."}
+              : "Enter your password to access your Finora dashboard."}
           </p>
         </div>
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="flex flex-col gap-3.5" noValidate>
-          {/* Full Name Field (Sign Up Only) */}
+          {/* SIGN UP FIELDS: First Name & Last Name */}
           {mode === "signup" && (
-            <div>
-              <label htmlFor="auth-name" className="block text-xs font-semibold text-slate-700 mb-1">
-                Full Name
-              </label>
-              <input
-                id="auth-name"
-                type="text"
-                value={displayName}
-                onChange={(e) => setDisplayName(e.target.value)}
-                placeholder="Alex Rivera"
-                disabled={isSubmitting}
-                className={`w-full px-4 py-3 rounded-xl border text-sm text-[#17142B] bg-slate-50/50 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:bg-white transition-all ${
-                  errors.displayName
-                    ? "border-red-400 focus:ring-red-400/40"
-                    : "border-slate-200 focus:border-[#4010D8] focus:ring-[#4010D8]/20"
-                }`}
-              />
-              {errors.displayName && (
-                <p className="mt-1 text-xs text-red-500">{errors.displayName}</p>
-              )}
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label htmlFor="modal-auth-firstname" className="block text-xs font-semibold text-slate-700 mb-1">
+                  First Name
+                </label>
+                <input
+                  id="modal-auth-firstname"
+                  type="text"
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                  placeholder="Alex"
+                  disabled={isSubmitting}
+                  className={`w-full px-3.5 py-3 rounded-xl border text-sm text-main-text bg-slate-50/50 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:bg-white transition-all ${
+                    errors.firstName
+                      ? "border-red-400 focus:ring-red-400/40"
+                      : "border-slate-200 focus:border-primary focus:ring-primary/20"
+                  }`}
+                />
+                {errors.firstName && (
+                  <p className="mt-1 text-xs text-red-500">{errors.firstName}</p>
+                )}
+              </div>
+              <div>
+                <label htmlFor="modal-auth-lastname" className="block text-xs font-semibold text-slate-700 mb-1">
+                  Last Name
+                </label>
+                <input
+                  id="modal-auth-lastname"
+                  type="text"
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
+                  placeholder="Morgan"
+                  disabled={isSubmitting}
+                  className={`w-full px-3.5 py-3 rounded-xl border text-sm text-main-text bg-slate-50/50 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:bg-white transition-all ${
+                    errors.lastName
+                      ? "border-red-400 focus:ring-red-400/40"
+                      : "border-slate-200 focus:border-primary focus:ring-primary/20"
+                  }`}
+                />
+                {errors.lastName && (
+                  <p className="mt-1 text-xs text-red-500">{errors.lastName}</p>
+                )}
+              </div>
             </div>
           )}
-
-          {/* Email Address Field */}
-          <div>
-            <label htmlFor="auth-email" className="block text-xs font-semibold text-slate-700 mb-1">
-              Email Address
-            </label>
-            <input
-              id="auth-email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="alex@finora.bank"
-              disabled={isSubmitting}
-              className={`w-full px-4 py-3 rounded-xl border text-sm text-[#17142B] bg-slate-50/50 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:bg-white transition-all ${
-                errors.email
-                  ? "border-red-400 focus:ring-red-400/40"
-                  : "border-slate-200 focus:border-[#4010D8] focus:ring-[#4010D8]/20"
-              }`}
-            />
-            {errors.email && <p className="mt-1 text-xs text-red-500">{errors.email}</p>}
-          </div>
 
           {/* Password Field */}
           <div>
             <div className="flex items-center justify-between mb-1">
-              <label htmlFor="auth-password" className="block text-xs font-semibold text-slate-700">
+              <label htmlFor="modal-auth-password" className="block text-xs font-semibold text-slate-700">
                 Password
               </label>
               {mode === "signin" && (
-                <span className="text-[11px] text-[#4010D8] font-medium hover:underline cursor-pointer">
+                <span className="text-[11px] text-primary font-medium hover:underline cursor-pointer">
                   Forgot password?
                 </span>
               )}
             </div>
-            <input
-              id="auth-password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••"
-              disabled={isSubmitting}
-              className={`w-full px-4 py-3 rounded-xl border text-sm text-[#17142B] bg-slate-50/50 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:bg-white transition-all ${
-                errors.password
-                  ? "border-red-400 focus:ring-red-400/40"
-                  : "border-slate-200 focus:border-[#4010D8] focus:ring-[#4010D8]/20"
-              }`}
-            />
+            <div className="relative">
+              <input
+                id="modal-auth-password"
+                type={showPassword ? "text" : "password"}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="••••••••"
+                disabled={isSubmitting}
+                className={`w-full pl-3.5 pr-10 py-3 rounded-xl border text-sm text-main-text bg-slate-50/50 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:bg-white transition-all ${
+                  errors.password
+                    ? "border-red-400 focus:ring-red-400/40"
+                    : "border-slate-200 focus:border-primary focus:ring-primary/20"
+                }`}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                aria-label={showPassword ? "Hide password" : "Show password"}
+                className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-700"
+              >
+                {showPassword ? (
+                  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
+                    <line x1="1" y1="1" x2="23" y2="23" />
+                  </svg>
+                ) : (
+                  <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                    <circle cx="12" cy="12" r="3" />
+                  </svg>
+                )}
+              </button>
+            </div>
             {errors.password && <p className="mt-1 text-xs text-red-500">{errors.password}</p>}
           </div>
 
@@ -258,7 +289,7 @@ export function AuthModal({
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full mt-2 py-3.5 px-6 bg-[#4010D8] hover:bg-[#3409B8] active:scale-[0.98] text-white font-bold text-base rounded-full shadow-[0_8px_20px_rgba(64,16,216,0.35)] transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-70"
+            className="w-full mt-2 py-3.5 px-6 bg-primary hover:bg-[#3409B8] active:scale-[0.98] text-white font-bold text-base rounded-full shadow-[0_8px_20px_rgba(64,16,216,0.35)] transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-70"
           >
             {isSubmitting ? (
               <span className="inline-block w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -283,14 +314,14 @@ export function AuthModal({
           type="button"
           onClick={handleQuickDemoLogin}
           disabled={isSubmitting}
-          className="w-full py-3 px-4 bg-[#F5F3FF] hover:bg-[#EDE9FE] active:scale-[0.98] text-[#4010D8] font-semibold text-xs sm:text-sm rounded-full border border-purple-200/80 transition-all flex items-center justify-center gap-2 cursor-pointer"
+          className="w-full py-3 px-4 bg-app-bg hover:bg-[#EDE9FE] active:scale-[0.98] text-primary font-semibold text-xs sm:text-sm rounded-full border border-purple-200/80 transition-all flex items-center justify-center gap-2 cursor-pointer"
         >
-          <svg className="w-4 h-4 text-[#4010D8]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+          <svg className="w-4 h-4 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
             <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
             <circle cx="9" cy="7" r="4" />
             <polyline points="16 11 18 13 22 9" />
           </svg>
-          <span>Continue as Demo User (Alex Rivera)</span>
+          <span>Continue as Demo User (Daniel)</span>
         </button>
 
         {/* Security / Privacy notice adhering to AGENTS.md */}

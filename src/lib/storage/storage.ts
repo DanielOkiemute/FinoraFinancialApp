@@ -36,6 +36,32 @@ export function loadAppState(): FinoraAppState {
 
     const parsed = JSON.parse(raw);
     if (isAppStateValid(parsed)) {
+      // Migrate legacy default seed state or update transactions list to full 5 items
+      if (
+        parsed.profile.displayName === "Alex Morgan" ||
+        parsed.balance.currency === "USD" ||
+        parsed.transactions.length < 5
+      ) {
+        const migrated: FinoraAppState = {
+          ...parsed,
+          profile: {
+            ...parsed.profile,
+            displayName: parsed.profile.displayName === "Alex Morgan" ? initialSeedState.profile.displayName : parsed.profile.displayName,
+            avatarUrl: initialSeedState.profile.avatarUrl,
+          },
+          balance: {
+            available: initialSeedState.balance.available,
+            currency: "NGN",
+          },
+          transactions: initialSeedState.transactions,
+          preferences: {
+            ...parsed.preferences,
+            currency: "NGN",
+          },
+        };
+        saveAppState(migrated);
+        return migrated;
+      }
       return parsed;
     }
 

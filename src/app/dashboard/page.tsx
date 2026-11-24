@@ -25,8 +25,8 @@ export default function DashboardPage() {
   if (!appState) {
     return (
       <MobileShell>
-        <div className="w-full h-full flex items-center justify-center bg-[#F5F3FF]">
-          <span className="w-8 h-8 border-3 border-[#4010D8]/20 border-t-[#4010D8] rounded-full animate-spin" />
+        <div className="w-full h-full flex items-center justify-center bg-app-bg">
+          <span className="w-8 h-8 border-3 border-primary/20 border-t-primary rounded-full animate-spin" />
         </div>
       </MobileShell>
     );
