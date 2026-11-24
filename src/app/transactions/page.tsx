@@ -20,9 +20,13 @@ export default function TransactionsPage() {
     router.push("/dashboard");
   };
 
-  const handleNavigateTab = (tab: "home" | "transactions" | "savings" | "cards" | "more") => {
+  const handleNavigateTab = (tab: "home" | "transactions" | "savings" | "analytics" | "more") => {
     if (tab === "home") {
       router.push("/dashboard");
+    } else if (tab === "savings") {
+      router.push("/savings");
+    } else if (tab === "analytics") {
+      router.push("/analytics");
     }
   };
 

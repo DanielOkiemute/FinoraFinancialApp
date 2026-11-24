@@ -61,7 +61,7 @@ export function WelcomeScreen({ onNext }: WelcomeScreenProps = {}) {
           <div className="mt-7 text-center">
             <h2 className="text-[27px] sm:text-[30px] font-bold leading-tight tracking-tight text-white drop-shadow-sm">
               Your Trusted <br />
-              <span className="text-[#C4B5FD] font-extrabold bg-gradient-to-r from-[#D8B4FE] to-[#C084FC] bg-clip-text text-transparent">
+              <span className="font-extrabold bg-linear-to-r from-[#D8B4FE] to-[#C084FC] bg-clip-text text-transparent">
                 Financial
               </span>{" "}
               Partner
@@ -74,7 +74,7 @@ export function WelcomeScreen({ onNext }: WelcomeScreenProps = {}) {
 
         {/* Hero Illustration: Bank Building & Security Shield */}
         <div className="w-full flex items-center justify-center my-auto py-2">
-          <BankIllustration className="w-full max-w-[270px] sm:max-w-[300px] transition-transform duration-500 hover:scale-105" />
+          <BankIllustration className="w-full max-w-67.5 sm:max-w-75 transition-transform duration-500 hover:scale-105" />
         </div>
 
         {/* Bottom Actions: CTA Button & Pagination Dots */}
@@ -83,12 +83,12 @@ export function WelcomeScreen({ onNext }: WelcomeScreenProps = {}) {
           <button
             type="button"
             onClick={handleGetStarted}
-            className="group w-full py-4 px-6 bg-white text-[#4010D8] hover:text-[#30078F] rounded-full font-bold text-base sm:text-lg flex items-center justify-center gap-2.5 shadow-[0_12px_28px_rgba(23,4,79,0.35)] hover:bg-[#FAF9FF] active:scale-[0.98] transition-all duration-200 cursor-pointer"
+            className="group w-full py-4 px-6 bg-white text-primary hover:text-[#30078F] rounded-full font-bold text-base sm:text-lg flex items-center justify-center gap-2.5 shadow-[0_12px_28px_rgba(23,4,79,0.35)] hover:bg-[#FAF9FF] active:scale-[0.98] transition-all duration-200 cursor-pointer"
             aria-label="Get Started with Finora"
           >
             <span>Get Started</span>
             <svg
-              className="w-5 h-5 text-[#4010D8] group-hover:translate-x-1 transition-transform duration-200"
+              className="w-5 h-5 text-primary group-hover:translate-x-1 transition-transform duration-200"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"

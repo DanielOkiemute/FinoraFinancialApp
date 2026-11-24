@@ -46,7 +46,7 @@ export function SecureAuthScreen({
   };
 
   return (
-    <div className="relative w-full h-full flex flex-col justify-between overflow-hidden bg-white text-[#17142B] font-sans">
+    <div className="relative w-full h-full flex flex-col justify-between overflow-hidden bg-white text-main-text font-sans">
       {/* Top Subtle Ambient Glow */}
       <div
         className="absolute top-0 left-0 right-0 h-72 pointer-events-none opacity-60"
@@ -66,10 +66,10 @@ export function SecureAuthScreen({
             type="button"
             onClick={onBack}
             aria-label="Go back to previous screen"
-            className="w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 active:scale-95 text-[#17142B] flex items-center justify-center transition-all cursor-pointer shadow-sm"
+            className="w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 active:scale-95 text-main-text flex items-center justify-center transition-all cursor-pointer shadow-sm"
           >
             <svg
-              className="w-5 h-5 text-[#17142B]"
+              className="w-5 h-5 text-main-text"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
@@ -88,15 +88,15 @@ export function SecureAuthScreen({
       <div className="relative z-10 flex-1 flex flex-col items-center justify-between px-6 pt-2 pb-6">
         {/* Hero 3D Security Illustration */}
         <div className="w-full flex items-center justify-center my-auto py-2">
-          <SecureIllustration className="w-full max-w-[270px] sm:max-w-[300px] transition-transform duration-500 hover:scale-105" />
+          <SecureIllustration className="w-full max-w-67.5 sm:max-w-75 transition-transform duration-500 hover:scale-105" />
         </div>
 
         {/* Value Proposition Headline & Description */}
         <div className="w-full text-center mt-2 mb-4">
-          <h2 className="text-[26px] sm:text-[28px] font-bold text-[#17142B] tracking-tight leading-snug">
+          <h2 className="text-[26px] sm:text-[28px] font-bold text-main-text tracking-tight leading-snug">
             Secure & Reliable
           </h2>
-          <p className="mt-2 text-sm sm:text-base font-normal text-slate-500 leading-relaxed max-w-[250px] sm:max-w-[270px] mx-auto">
+          <p className="mt-2 text-sm sm:text-base font-normal text-slate-500 leading-relaxed max-w-62.5 sm:max-w-67.5 mx-auto">
             Your money is safe with bank-grade security.
           </p>
         </div>
@@ -114,7 +114,7 @@ export function SecureAuthScreen({
             aria-selected={activeDot === 0}
             className={`transition-all duration-300 rounded-full cursor-pointer ${
               activeDot === 0
-                ? "w-2.5 h-2.5 bg-[#4010D8]"
+                ? "w-2.5 h-2.5 bg-primary"
                 : "w-2.5 h-2.5 bg-[#DDD6FE] hover:bg-[#C4B5FD]"
             }`}
           />
@@ -125,7 +125,7 @@ export function SecureAuthScreen({
             aria-selected={activeDot === 1}
             className={`transition-all duration-300 rounded-full cursor-pointer ${
               activeDot === 1
-                ? "w-2.5 h-2.5 bg-[#4010D8]"
+                ? "w-2.5 h-2.5 bg-primary"
                 : "w-2.5 h-2.5 bg-[#DDD6FE] hover:bg-[#C4B5FD]"
             }`}
           />
@@ -136,7 +136,7 @@ export function SecureAuthScreen({
             aria-selected={activeDot === 2}
             className={`transition-all duration-300 rounded-full cursor-pointer ${
               activeDot === 2
-                ? "w-2.5 h-2.5 bg-[#4010D8]"
+                ? "w-2.5 h-2.5 bg-primary"
                 : "w-2.5 h-2.5 bg-[#DDD6FE] hover:bg-[#C4B5FD]"
             }`}
           />
@@ -148,7 +148,7 @@ export function SecureAuthScreen({
           <button
             type="button"
             onClick={handleOpenSignUp}
-            className="group w-full py-4 px-6 bg-[#4010D8] hover:bg-[#3409B8] active:scale-[0.98] text-white rounded-full font-bold text-base sm:text-lg flex items-center justify-center gap-2.5 shadow-[0_12px_24px_rgba(64,16,216,0.3)] transition-all duration-200 cursor-pointer"
+            className="group w-full py-4 px-6 bg-primary hover:bg-[#3409B8] active:scale-[0.98] text-white rounded-full font-bold text-base sm:text-lg flex items-center justify-center gap-2.5 shadow-[0_12px_24px_rgba(64,16,216,0.3)] transition-all duration-200 cursor-pointer"
             aria-label="Sign Up for Finora"
           >
             <span>Sign Up</span>
@@ -171,7 +171,7 @@ export function SecureAuthScreen({
           <button
             type="button"
             onClick={handleOpenSignIn}
-            className="py-2.5 px-4 text-sm font-semibold text-[#4010D8] hover:text-[#2E07A0] transition-colors cursor-pointer flex items-center justify-center gap-1"
+            className="py-2.5 px-4 text-sm font-semibold text-primary hover:text-[#2E07A0] transition-colors cursor-pointer flex items-center justify-center gap-1"
             aria-label="Sign In to existing Finora account"
           >
             <span className="text-slate-500 font-normal">Already have an account?</span>

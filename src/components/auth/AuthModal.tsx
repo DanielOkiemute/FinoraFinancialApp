@@ -126,7 +126,7 @@ export function AuthModal({
       <div className="absolute inset-0" onClick={onClose} aria-hidden="true" />
 
       {/* Modal Surface */}
-      <div className="relative z-10 w-full max-w-sm sm:max-w-md bg-white rounded-t-[32px] sm:rounded-[32px] p-6 shadow-2xl border border-slate-100 flex flex-col text-[#17142B] font-sans max-h-[90vh] overflow-y-auto no-scrollbar [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+      <div className="relative z-10 w-full max-w-sm sm:max-w-md bg-white rounded-t-4xl sm:rounded-4xl p-6 shadow-2xl border border-slate-100 flex flex-col text-main-text font-sans max-h-[90vh] overflow-y-auto no-scrollbar scrollbar-none [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
         {/* Top Handle / Close Button */}
         <div className="w-full flex items-center justify-between pb-2">
           <div className="w-12 h-1.5 bg-slate-200 rounded-full mx-auto sm:hidden mb-2" />
@@ -144,7 +144,7 @@ export function AuthModal({
         </div>
 
         {/* Tab Switcher: Sign Up vs Sign In */}
-        <div className="flex bg-[#F5F3FF] p-1 rounded-2xl mb-5 mt-1 border border-purple-100">
+        <div className="flex bg-app-bg p-1 rounded-2xl mb-5 mt-1 border border-purple-100">
           <button
             type="button"
             onClick={() => {
@@ -153,7 +153,7 @@ export function AuthModal({
             }}
             className={`flex-1 py-2.5 text-sm font-semibold rounded-xl transition-all duration-200 cursor-pointer ${
               mode === "signup"
-                ? "bg-white text-[#4010D8] shadow-sm"
+                ? "bg-white text-primary shadow-sm"
                 : "text-slate-500 hover:text-slate-800"
             }`}
           >
@@ -167,7 +167,7 @@ export function AuthModal({
             }}
             className={`flex-1 py-2.5 text-sm font-semibold rounded-xl transition-all duration-200 cursor-pointer ${
               mode === "signin"
-                ? "bg-white text-[#4010D8] shadow-sm"
+                ? "bg-white text-primary shadow-sm"
                 : "text-slate-500 hover:text-slate-800"
             }`}
           >
@@ -177,7 +177,7 @@ export function AuthModal({
 
         {/* Header */}
         <div className="mb-5 text-center">
-          <h2 id="auth-modal-title" className="text-2xl font-bold tracking-tight text-[#17142B]">
+          <h2 id="auth-modal-title" className="text-2xl font-bold tracking-tight text-main-text">
             {mode === "signup" ? "Create an account" : "Welcome back"}
           </h2>
           <p className="mt-1 text-xs sm:text-sm text-slate-500">
@@ -203,10 +203,10 @@ export function AuthModal({
                   onChange={(e) => setFirstName(e.target.value)}
                   placeholder="Alex"
                   disabled={isSubmitting}
-                  className={`w-full px-3.5 py-3 rounded-xl border text-sm text-[#17142B] bg-slate-50/50 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:bg-white transition-all ${
+                  className={`w-full px-3.5 py-3 rounded-xl border text-sm text-main-text bg-slate-50/50 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:bg-white transition-all ${
                     errors.firstName
                       ? "border-red-400 focus:ring-red-400/40"
-                      : "border-slate-200 focus:border-[#4010D8] focus:ring-[#4010D8]/20"
+                      : "border-slate-200 focus:border-primary focus:ring-primary/20"
                   }`}
                 />
                 {errors.firstName && (
@@ -224,10 +224,10 @@ export function AuthModal({
                   onChange={(e) => setLastName(e.target.value)}
                   placeholder="Morgan"
                   disabled={isSubmitting}
-                  className={`w-full px-3.5 py-3 rounded-xl border text-sm text-[#17142B] bg-slate-50/50 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:bg-white transition-all ${
+                  className={`w-full px-3.5 py-3 rounded-xl border text-sm text-main-text bg-slate-50/50 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:bg-white transition-all ${
                     errors.lastName
                       ? "border-red-400 focus:ring-red-400/40"
-                      : "border-slate-200 focus:border-[#4010D8] focus:ring-[#4010D8]/20"
+                      : "border-slate-200 focus:border-primary focus:ring-primary/20"
                   }`}
                 />
                 {errors.lastName && (
@@ -244,7 +244,7 @@ export function AuthModal({
                 Password
               </label>
               {mode === "signin" && (
-                <span className="text-[11px] text-[#4010D8] font-medium hover:underline cursor-pointer">
+                <span className="text-[11px] text-primary font-medium hover:underline cursor-pointer">
                   Forgot password?
                 </span>
               )}
@@ -257,10 +257,10 @@ export function AuthModal({
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
                 disabled={isSubmitting}
-                className={`w-full pl-3.5 pr-10 py-3 rounded-xl border text-sm text-[#17142B] bg-slate-50/50 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:bg-white transition-all ${
+                className={`w-full pl-3.5 pr-10 py-3 rounded-xl border text-sm text-main-text bg-slate-50/50 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:bg-white transition-all ${
                   errors.password
                     ? "border-red-400 focus:ring-red-400/40"
-                    : "border-slate-200 focus:border-[#4010D8] focus:ring-[#4010D8]/20"
+                    : "border-slate-200 focus:border-primary focus:ring-primary/20"
                 }`}
               />
               <button
@@ -289,7 +289,7 @@ export function AuthModal({
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full mt-2 py-3.5 px-6 bg-[#4010D8] hover:bg-[#3409B8] active:scale-[0.98] text-white font-bold text-base rounded-full shadow-[0_8px_20px_rgba(64,16,216,0.35)] transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-70"
+            className="w-full mt-2 py-3.5 px-6 bg-primary hover:bg-[#3409B8] active:scale-[0.98] text-white font-bold text-base rounded-full shadow-[0_8px_20px_rgba(64,16,216,0.35)] transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-70"
           >
             {isSubmitting ? (
               <span className="inline-block w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -314,9 +314,9 @@ export function AuthModal({
           type="button"
           onClick={handleQuickDemoLogin}
           disabled={isSubmitting}
-          className="w-full py-3 px-4 bg-[#F5F3FF] hover:bg-[#EDE9FE] active:scale-[0.98] text-[#4010D8] font-semibold text-xs sm:text-sm rounded-full border border-purple-200/80 transition-all flex items-center justify-center gap-2 cursor-pointer"
+          className="w-full py-3 px-4 bg-app-bg hover:bg-[#EDE9FE] active:scale-[0.98] text-primary font-semibold text-xs sm:text-sm rounded-full border border-purple-200/80 transition-all flex items-center justify-center gap-2 cursor-pointer"
         >
-          <svg className="w-4 h-4 text-[#4010D8]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+          <svg className="w-4 h-4 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
             <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
             <circle cx="9" cy="7" r="4" />
             <polyline points="16 11 18 13 22 9" />

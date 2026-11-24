@@ -5,6 +5,8 @@ import { StatusBar } from "@/components/ui/StatusBar";
 import { FinoraAppState } from "@/types";
 import { saveAppState } from "@/lib/storage/storage";
 import { TransactionsScreen } from "@/components/transactions/TransactionsScreen";
+import { IncomeExpenseScreen } from "@/components/savings/IncomeExpenseScreen";
+import { AnalyticsScreen } from "@/components/analytics/AnalyticsScreen";
 
 interface DashboardOverviewProps {
   appState: FinoraAppState;
@@ -16,7 +18,7 @@ function UserAvatar({ displayName, avatarUrl }: { displayName: string; avatarUrl
   const [imgError, setImgError] = useState(false);
 
   return (
-    <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-white/40 shadow-sm shrink-0 bg-gradient-to-tr from-[#3108A4] to-[#6D3BF5] flex items-center justify-center">
+    <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-white/40 shadow-sm shrink-0 bg-linear-to-tr from-[#3108A4] to-primary-accent flex items-center justify-center">
       {!imgError && avatarUrl ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img
@@ -46,7 +48,7 @@ export function DashboardOverview({
   onReset,
 }: DashboardOverviewProps) {
   const [hideBalance, setHideBalance] = useState(appState.preferences.hideBalances);
-  const [activeTab, setActiveTab] = useState<"home" | "transactions" | "savings" | "cards" | "more">("home");
+  const [activeTab, setActiveTab] = useState<"home" | "transactions" | "savings" | "analytics" | "more">("home");
   const [showNotificationToast, setShowNotificationToast] = useState(false);
 
   const toggleHideBalance = () => {
@@ -80,12 +82,35 @@ export function DashboardOverview({
     );
   }
 
+  // If user tapped 'Savings' tab, show the dedicated Income & Expenses screen
+  if (activeTab === "savings") {
+    return (
+      <IncomeExpenseScreen
+        appState={appState}
+        onStateUpdate={onStateUpdate}
+        onBack={() => setActiveTab("home")}
+        onNavigateTab={setActiveTab}
+      />
+    );
+  }
+
+  // If user tapped 'Analytics' tab, show the dedicated Analytics Screen
+  if (activeTab === "analytics") {
+    return (
+      <AnalyticsScreen
+        appState={appState}
+        onBack={() => setActiveTab("home")}
+        onNavigateTab={setActiveTab}
+      />
+    );
+  }
+
   return (
-    <div className="relative w-full h-full flex flex-col justify-between overflow-hidden bg-[#F7F6FD] text-[#17142B] font-sans no-scrollbar">
+    <div className="relative w-full h-full flex flex-col justify-between overflow-hidden bg-[#F7F6FD] text-main-text font-sans no-scrollbar">
       {/* Top Deep Purple Gradient Background Header */}
-      <div className="absolute top-0 left-0 right-0 h-[245px] sm:h-[265px] bg-gradient-to-b from-[#2E0796] via-[#3F10D8] to-[#5916E6] pointer-events-none" />
+      <div className="absolute top-0 left-0 right-0 h-61.25 sm:h-66.25 bg-linear-to-b from-[#2E0796] via-[#3F10D8] to-[#5916E6] pointer-events-none" />
       <div
-        className="absolute top-0 left-0 right-0 h-[265px] pointer-events-none opacity-40"
+        className="absolute top-0 left-0 right-0 h-66.25 pointer-events-none opacity-40"
         style={{
           background: "radial-gradient(ellipse at 85% 10%, rgba(167, 139, 250, 0.45) 0%, transparent 60%)",
         }}
@@ -95,7 +120,7 @@ export function DashboardOverview({
       <StatusBar variant="light" time="9:41" className="relative z-20" />
 
       {/* Scrollable Content Container (NO Scroll Bar) */}
-      <div className="relative z-10 flex-1 flex flex-col px-5 pt-1 pb-3 overflow-y-auto no-scrollbar [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+      <div className="relative z-10 flex-1 flex flex-col px-5 pt-1 pb-3 overflow-y-auto no-scrollbar scrollbar-none [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
         {/* User Greeting & Notification Bell Header */}
         <header className="flex items-center justify-between pt-1 pb-3">
           <div className="flex items-center gap-3">
@@ -124,12 +149,12 @@ export function DashboardOverview({
 
         {/* Optional Notification Toast */}
         {showNotificationToast && (
-          <div className="mb-2 p-2.5 rounded-2xl bg-white/95 text-[#17142B] text-xs shadow-lg border border-purple-100 flex items-center justify-between animate-fadeIn">
+          <div className="mb-2 p-2.5 rounded-2xl bg-white/95 text-main-text text-xs shadow-lg border border-purple-100 flex items-center justify-between animate-fadeIn">
             <span>All accounts are secure. 2 recent simulated actions.</span>
             <button
               type="button"
               onClick={() => setShowNotificationToast(false)}
-              className="text-[#6D3BF5] font-bold ml-2 cursor-pointer"
+              className="text-primary-accent font-bold ml-2 cursor-pointer"
             >
               Dismiss
             </button>
@@ -164,7 +189,7 @@ export function DashboardOverview({
 
             <button
               type="button"
-              className="text-[#6D3BF5] hover:text-[#4010D8] p-1 transition-colors cursor-pointer"
+              className="text-primary-accent hover:text-primary p-1 transition-colors cursor-pointer"
               title="Currency details"
             >
               <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
@@ -175,10 +200,10 @@ export function DashboardOverview({
 
           {/* Amount & Percentage Gain Pill */}
           <div className="mt-2 flex items-center justify-between">
-            <div className="text-[26px] sm:text-[30px] font-extrabold text-[#17142B] tracking-tight">
+            <div className="text-[26px] sm:text-[30px] font-extrabold text-main-text tracking-tight">
               {hideBalance ? "••••••••" : formattedBalance}
             </div>
-            <div className="inline-flex items-center gap-1 bg-[#E8F8F0] text-[#16A36A] px-2.5 py-1 rounded-full text-xs font-bold border border-emerald-100/80">
+            <div className="inline-flex items-center gap-1 bg-[#E8F8F0] text-success px-2.5 py-1 rounded-full text-xs font-bold border border-emerald-100/80">
               <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                 <line x1="12" y1="19" x2="12" y2="5" />
                 <polyline points="5 12 12 5 19 12" />
@@ -216,15 +241,15 @@ export function DashboardOverview({
           {/* Send Money */}
           <button
             type="button"
-            className="flex flex-col items-center justify-center p-2.5 rounded-[22px] bg-white hover:bg-purple-50/50 active:scale-95 transition-all shadow-sm border border-purple-100/60 min-h-[84px] cursor-pointer"
+            className="flex flex-col items-center justify-center p-2.5 rounded-[22px] bg-white hover:bg-purple-50/50 active:scale-95 transition-all shadow-sm border border-purple-100/60 min-h-21 cursor-pointer"
           >
-            <div className="w-7 h-7 flex items-center justify-center text-[#6D3BF5]">
+            <div className="w-7 h-7 flex items-center justify-center text-primary-accent">
               <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                 <line x1="22" y1="2" x2="11" y2="13" />
                 <polygon points="22 2 15 22 11 13 2 9 22 2" />
               </svg>
             </div>
-            <span className="text-[11px] sm:text-xs font-semibold text-[#17142B] mt-1.5 leading-tight text-center">
+            <span className="text-[11px] sm:text-xs font-semibold text-main-text mt-1.5 leading-tight text-center">
               Send<br />Money
             </span>
           </button>
@@ -232,15 +257,15 @@ export function DashboardOverview({
           {/* Top Up */}
           <button
             type="button"
-            className="flex flex-col items-center justify-center p-2.5 rounded-[22px] bg-white hover:bg-purple-50/50 active:scale-95 transition-all shadow-sm border border-purple-100/60 min-h-[84px] cursor-pointer"
+            className="flex flex-col items-center justify-center p-2.5 rounded-[22px] bg-white hover:bg-purple-50/50 active:scale-95 transition-all shadow-sm border border-purple-100/60 min-h-21 cursor-pointer"
           >
-            <div className="w-7 h-7 flex items-center justify-center text-[#6D3BF5]">
+            <div className="w-7 h-7 flex items-center justify-center text-primary-accent">
               <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                 <rect x="5" y="2" width="14" height="20" rx="3" />
                 <line x1="12" y1="18" x2="12.01" y2="18" strokeWidth="2.5" />
               </svg>
             </div>
-            <span className="text-[11px] sm:text-xs font-semibold text-[#17142B] mt-1.5 leading-tight text-center">
+            <span className="text-[11px] sm:text-xs font-semibold text-main-text mt-1.5 leading-tight text-center">
               Top Up
             </span>
           </button>
@@ -248,14 +273,14 @@ export function DashboardOverview({
           {/* Pay Bills */}
           <button
             type="button"
-            className="flex flex-col items-center justify-center p-2.5 rounded-[22px] bg-white hover:bg-purple-50/50 active:scale-95 transition-all shadow-sm border border-purple-100/60 min-h-[84px] cursor-pointer"
+            className="flex flex-col items-center justify-center p-2.5 rounded-[22px] bg-white hover:bg-purple-50/50 active:scale-95 transition-all shadow-sm border border-purple-100/60 min-h-21 cursor-pointer"
           >
-            <div className="w-7 h-7 flex items-center justify-center text-[#6D3BF5]">
+            <div className="w-7 h-7 flex items-center justify-center text-primary-accent">
               <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                 <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
               </svg>
             </div>
-            <span className="text-[11px] sm:text-xs font-semibold text-[#17142B] mt-1.5 leading-tight text-center">
+            <span className="text-[11px] sm:text-xs font-semibold text-main-text mt-1.5 leading-tight text-center">
               Pay Bills
             </span>
           </button>
@@ -263,7 +288,7 @@ export function DashboardOverview({
           {/* More */}
           <button
             type="button"
-            className="flex flex-col items-center justify-center p-2.5 rounded-[22px] bg-white hover:bg-purple-50/50 active:scale-95 transition-all shadow-sm border border-purple-100/60 min-h-[84px] cursor-pointer"
+            className="flex flex-col items-center justify-center p-2.5 rounded-[22px] bg-white hover:bg-purple-50/50 active:scale-95 transition-all shadow-sm border border-purple-100/60 min-h-21 cursor-pointer"
           >
             <div className="w-7 h-7 flex items-center justify-center">
               <svg className="w-6 h-6" viewBox="0 0 24 24" fill="#6D3BF5">
@@ -273,7 +298,7 @@ export function DashboardOverview({
                 <circle cx="17" cy="17" r="2.5" />
               </svg>
             </div>
-            <span className="text-[11px] sm:text-xs font-semibold text-[#17142B] mt-1.5 leading-tight text-center">
+            <span className="text-[11px] sm:text-xs font-semibold text-main-text mt-1.5 leading-tight text-center">
               More
             </span>
           </button>
@@ -282,11 +307,11 @@ export function DashboardOverview({
         {/* Recent Transactions Section */}
         <section className="mt-5 sm:mt-6">
           <div className="flex items-center justify-between mb-2.5">
-            <h2 className="text-base font-bold text-[#17142B]">Recent Transactions</h2>
+            <h2 className="text-base font-bold text-main-text">Recent Transactions</h2>
             <button
               type="button"
               onClick={() => setActiveTab("transactions")}
-              className="text-xs font-semibold text-[#6D3BF5] hover:text-[#4010D8] inline-flex items-center gap-1 cursor-pointer"
+              className="text-xs font-semibold text-primary-accent hover:text-primary inline-flex items-center gap-1 cursor-pointer"
             >
               <span>See all</span>
               <span aria-hidden="true">→</span>
@@ -294,44 +319,47 @@ export function DashboardOverview({
           </div>
 
           <div className="flex flex-col gap-2.5">
-            {/* Transaction 1: Money Received from Adekunle */}
-            <div className="flex items-center justify-between p-3.5 bg-white rounded-2xl shadow-sm border border-purple-100/60">
-              <div className="flex items-center gap-3">
-                <div className="w-11 h-11 rounded-full bg-[#E8F8F0] text-[#16A36A] flex items-center justify-center shrink-0">
-                  <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                    <line x1="7" y1="17" x2="17" y2="7" />
-                    <polyline points="7 7 17 7 17 17" />
-                  </svg>
-                </div>
-                <div>
-                  <p className="text-sm font-bold text-[#17142B] leading-tight">Money Received</p>
-                  <p className="text-xs text-slate-500 font-medium mt-0.5">From Adekunle</p>
-                  <p className="text-[11px] text-slate-400 mt-0.5">Today, 9:20 AM</p>
-                </div>
-              </div>
-              <div className="text-right">
-                <p className="text-sm sm:text-base font-extrabold text-[#16A36A]">+₦50,000</p>
-              </div>
-            </div>
+            {appState.transactions.slice(0, 2).map((tx) => {
+              const isIncome = tx.type === "income";
+              const formattedAmount = `${isIncome ? "+" : "-"}₦${tx.amount.toLocaleString("en-US", {
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 2,
+              })}`;
 
-            {/* Transaction 2: Electricity Bill Payment */}
-            <div className="flex items-center justify-between p-3.5 bg-white rounded-2xl shadow-sm border border-purple-100/60">
-              <div className="flex items-center gap-3">
-                <div className="w-11 h-11 rounded-full bg-[#FEECEC] text-[#E5484D] flex items-center justify-center shrink-0">
-                  <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                    <line x1="7" y1="17" x2="17" y2="7" />
-                    <polyline points="7 7 17 7 17 17" />
-                  </svg>
+              return (
+                <div key={tx.id} className="flex items-center justify-between p-3.5 bg-white rounded-2xl shadow-sm border border-purple-100/60">
+                  <div className="flex items-center gap-3">
+                    <div className={`w-11 h-11 rounded-full flex items-center justify-center shrink-0 ${
+                      isIncome ? "bg-[#E8F8F0] text-success" : "bg-[#FEECEC] text-error"
+                    }`}>
+                      {isIncome ? (
+                        <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                          <line x1="7" y1="17" x2="17" y2="7" />
+                          <polyline points="7 7 17 7 17 17" />
+                        </svg>
+                      ) : (
+                        <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                          <line x1="17" y1="7" x2="7" y2="17" />
+                          <polyline points="17 17 7 17 7 7" />
+                        </svg>
+                      )}
+                    </div>
+                    <div>
+                      <p className="text-sm font-bold text-main-text leading-tight">{tx.title}</p>
+                      {tx.description && (
+                        <p className="text-xs text-slate-500 font-medium mt-0.5">{tx.description}</p>
+                      )}
+                      <p className="text-[11px] text-slate-400 mt-0.5">{tx.createdAt}</p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <p className={`text-sm sm:text-base font-extrabold ${isIncome ? "text-success" : "text-error"}`}>
+                      {formattedAmount}
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-sm font-bold text-[#17142B] leading-tight">Electricity Bill Payment</p>
-                  <p className="text-[11px] text-slate-400 mt-1">Yesterday, 7:45 PM</p>
-                </div>
-              </div>
-              <div className="text-right">
-                <p className="text-sm sm:text-base font-extrabold text-[#E5484D]">-₦12,500</p>
-              </div>
-            </div>
+              );
+            })}
           </div>
         </section>
 
@@ -358,7 +386,7 @@ export function DashboardOverview({
         <button
           type="button"
           onClick={() => setActiveTab("home")}
-          className="flex flex-col items-center gap-1 transition-all cursor-pointer text-[#4010D8]"
+          className="flex flex-col items-center gap-1 transition-all cursor-pointer text-primary"
         >
           <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
             <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
@@ -392,17 +420,18 @@ export function DashboardOverview({
           <span className="text-[10px] font-medium">Savings</span>
         </button>
 
-        {/* Cards Tab */}
+        {/* Analytics Tab */}
         <button
           type="button"
-          onClick={() => setActiveTab("cards")}
+          onClick={() => setActiveTab("analytics")}
           className="flex flex-col items-center gap-1 transition-all cursor-pointer text-slate-400 hover:text-slate-600"
         >
           <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-            <rect x="2" y="5" width="20" height="14" rx="2" />
-            <line x1="2" y1="10" x2="22" y2="10" />
+            <path d="M18 20V10" />
+            <path d="M12 20V4" />
+            <path d="M6 20v-6" />
           </svg>
-          <span className="text-[10px] font-medium">Cards</span>
+          <span className="text-[10px] font-medium">Analytics</span>
         </button>
 
         {/* More Tab */}
