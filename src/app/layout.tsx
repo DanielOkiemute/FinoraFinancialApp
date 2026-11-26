@@ -9,8 +9,9 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Finora | Your Trusted Financial Partner",
-  description: "Bank • Pay • Save • Grow. Simple. Secure. Smart.",
+  title: "Finora | Personal Finance Demo",
+  description:
+    "A personal finance demo with fictional balances and simulated banking actions. Only non-sensitive demo data is stored locally in this browser.",
   icons: {
     icon: "/favicon.ico",
   },
@@ -19,7 +20,6 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  maximumScale: 1,
   themeColor: "#2A0878",
 };
 

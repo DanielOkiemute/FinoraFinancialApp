@@ -1,6 +1,7 @@
 import { FinoraAppState } from "@/types";
 
-export const initialSeedState: FinoraAppState = {
+export function createInitialSeedState(): FinoraAppState {
+  return {
   version: 1,
   profile: {
     displayName: "Daniel",
@@ -85,4 +86,5 @@ export const initialSeedState: FinoraAppState = {
     hideBalances: false,
     theme: "light",
   },
-};
+  };
+}

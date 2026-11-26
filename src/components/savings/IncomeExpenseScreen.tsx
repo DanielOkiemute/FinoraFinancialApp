@@ -9,7 +9,7 @@ interface IncomeExpenseScreenProps {
   appState: FinoraAppState;
   onStateUpdate: (newState: FinoraAppState) => void;
   onBack: () => void;
-  onNavigateTab?: (tab: "home" | "transactions" | "savings" | "analytics" | "more") => void;
+  onNavigateTab?: (tab: "home" | "transactions" | "savings" | "analytics") => void;
 }
 
 interface CategoryOption {
@@ -694,15 +694,16 @@ export function IncomeExpenseScreen({
         {/* More Tab */}
         <button
           type="button"
-          onClick={() => onNavigateTab && onNavigateTab("more")}
-          className="flex flex-col items-center gap-1 text-slate-400 hover:text-slate-600 cursor-pointer"
+          disabled
+          title="More is unavailable in this demo"
+          className="flex flex-col items-center gap-1 text-slate-300 cursor-not-allowed"
         >
           <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
             <circle cx="5" cy="12" r="2" />
             <circle cx="12" cy="12" r="2" />
             <circle cx="19" cy="12" r="2" />
           </svg>
-          <span className="text-[10px] font-medium">More</span>
+          <span className="text-[10px] font-medium">More (unavailable)</span>
         </button>
       </nav>
     </div>

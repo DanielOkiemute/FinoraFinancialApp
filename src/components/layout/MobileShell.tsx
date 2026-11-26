@@ -19,7 +19,7 @@ export function MobileShell({ children, className = "" }: MobileShellProps) {
 
       {/* Main Mobile App Frame */}
       <main
-        className={`relative w-full sm:max-w-105 h-dvh sm:h-215 sm:max-h-[92vh] sm:rounded-[44px] overflow-hidden flex flex-col justify-between shadow-[0_25px_60px_-15px_rgba(0,0,0,0.85)] sm:border-[7px] sm:border-slate-800/80 bg-linear-to-b from-[#2B0786] via-[#3C0CA8] to-[#17044F] ${className}`}
+        className={`relative w-full sm:max-w-105 min-h-dvh h-dvh sm:min-h-0 sm:h-215 sm:max-h-[92vh] overflow-x-hidden overflow-y-auto flex flex-col shadow-[0_25px_60px_-15px_rgba(0,0,0,0.85)] sm:rounded-[44px] sm:border-[7px] sm:border-slate-800/80 bg-linear-to-b from-[#2B0786] via-[#3C0CA8] to-[#17044F] ${className}`}
       >
         {children}
       </main>

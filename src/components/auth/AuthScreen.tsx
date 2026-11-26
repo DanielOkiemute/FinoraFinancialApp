@@ -31,19 +31,17 @@ export function AuthScreen({
   const [returningUser, setReturningUser] = useState<string>("Daniel");
   const [demoFeedback, setDemoFeedback] = useState<string | null>(null);
 
-  // Sync mode if initialMode changes
-  useEffect(() => {
-    setMode(initialMode);
-    setErrors({});
-    setDemoFeedback(null);
-  }, [initialMode]);
-
   // Load existing profile name for personalized sign-in experience
   useEffect(() => {
-    const state = loadAppState();
-    if (state.profile?.displayName) {
-      setReturningUser(state.profile.displayName);
-    }
+    let cancelled = false;
+    queueMicrotask(() => {
+      if (cancelled) return;
+      const state = loadAppState();
+      if (state.profile?.displayName) setReturningUser(state.profile.displayName);
+    });
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   // Compute password strength for Sign Up
@@ -106,27 +104,35 @@ export function AuthScreen({
 
     // Simulate secure authentication (per AGENTS.md, passwords are never stored in localStorage)
     setTimeout(() => {
-      const currentState = loadAppState();
-      const resolvedDisplayName =
-        mode === "signup"
-          ? `${firstName.trim()} ${lastName.trim()}`
-          : currentState.profile.displayName || returningUser || "Daniel";
+      try {
+        const currentState = loadAppState();
+        const resolvedDisplayName =
+          mode === "signup"
+            ? `${firstName.trim()} ${lastName.trim()}`
+            : currentState.profile.displayName || returningUser || "Daniel";
 
-      const updatedState: FinoraAppState = {
-        ...currentState,
-        profile: {
-          ...currentState.profile,
-          displayName: resolvedDisplayName,
-        },
-        onboardingComplete: true,
-      };
+        const updatedState: FinoraAppState = {
+          ...currentState,
+          profile: {
+            ...currentState.profile,
+            displayName: resolvedDisplayName,
+          },
+          onboardingComplete: true,
+        };
 
-      // Non-sensitive data persists safely
-      saveAppState(updatedState);
-      setIsSubmitting(false);
+        if (!saveAppState(updatedState)) {
+          setDemoFeedback("Your demo profile could not be saved. Please try again.");
+          return;
+        }
 
-      if (onSuccess) {
-        onSuccess({ displayName: resolvedDisplayName });
+        if (onSuccess) {
+          onSuccess({ displayName: resolvedDisplayName });
+        }
+      } catch (error) {
+        console.error("Failed to save demo authentication state:", error);
+        setDemoFeedback("Your demo profile could not be saved. Please try again.");
+      } finally {
+        setIsSubmitting(false);
       }
     }, 600);
   };
@@ -208,7 +214,7 @@ export function AuthScreen({
               setErrors({});
               setDemoFeedback(null);
             }}
-            aria-selected={mode === "signup"}
+            aria-pressed={mode === "signup"}
             className={`flex-1 py-2 sm:py-2.5 text-sm font-bold rounded-xl transition-all duration-200 cursor-pointer ${
               mode === "signup"
                 ? "bg-white text-[#4010D8] shadow-md shadow-purple-900/10 scale-[1.01]"
@@ -224,7 +230,7 @@ export function AuthScreen({
               setErrors({});
               setDemoFeedback(null);
             }}
-            aria-selected={mode === "signin"}
+            aria-pressed={mode === "signin"}
             className={`flex-1 py-2 sm:py-2.5 text-sm font-bold rounded-xl transition-all duration-200 cursor-pointer ${
               mode === "signin"
                 ? "bg-white text-[#4010D8] shadow-md shadow-purple-900/10 scale-[1.01]"

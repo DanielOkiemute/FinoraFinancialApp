@@ -12,7 +12,8 @@ export function SecureIllustration({ className = "" }: SecureIllustrationProps) 
         className="w-full h-auto overflow-visible"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
-        aria-label="Bank-Grade Security Illustration"
+        role="img"
+        aria-label="Illustration of fictional finance demo features"
       >
         <defs>
           {/* Ambient Ground Shadow */}

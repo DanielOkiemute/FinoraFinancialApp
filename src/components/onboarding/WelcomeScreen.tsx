@@ -7,7 +7,6 @@ import { FinoraLogo } from "@/components/ui/FinoraLogo";
 import { BankIllustration } from "@/components/ui/BankIllustration";
 import { BackgroundWaves } from "@/components/ui/BackgroundWaves";
 import { loadAppState, resetAppState } from "@/lib/storage/storage";
-import { FinoraAppState } from "@/types";
 
 interface WelcomeScreenProps {
   onNext?: () => void;
@@ -15,36 +14,46 @@ interface WelcomeScreenProps {
 
 export function WelcomeScreen({ onNext }: WelcomeScreenProps = {}) {
   const router = useRouter();
-  const [activeSlide, setActiveSlide] = useState<number>(0);
   const [isStarted, setIsStarted] = useState<boolean>(false);
-  const [appState, setAppState] = useState<FinoraAppState | null>(null);
+  const [resetError, setResetError] = useState<string | null>(null);
 
   // Safely hydrate from localStorage on mount (prevents SSR mismatch)
   useEffect(() => {
-    const state = loadAppState();
-    setAppState(state);
-    if (state.onboardingComplete) {
-      // Keep track of onboarding state
-      setIsStarted(true);
-    }
+    let cancelled = false;
+    queueMicrotask(() => {
+      if (cancelled) return;
+      const state = loadAppState();
+      if (state.onboardingComplete) setIsStarted(true);
+    });
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const handleGetStarted = () => {
     if (onNext) {
       onNext();
+    } else {
+      router.push("/auth");
     }
-    router.push("/auth");
   };
 
   const handleResetDemo = () => {
-    const defaultState = resetAppState();
-    setAppState(defaultState);
-    setIsStarted(false);
-    setActiveSlide(0);
+    if (!window.confirm("Reset the demo data stored only in this browser? This clears this browser's saved demo data.")) {
+      return;
+    }
+    try {
+      resetAppState();
+      setIsStarted(false);
+      setResetError(null);
+    } catch (error) {
+      console.error("Failed to reset demo data:", error);
+      setResetError("Demo data could not be reset. Please try again.");
+    }
   };
 
   return (
-    <div className="relative w-full h-full flex flex-col justify-between overflow-hidden text-white font-sans">
+    <div className="relative w-full min-h-full flex flex-col justify-between text-white font-sans">
       {/* Background Organic Wave Curves & Radiant Glow */}
       <BackgroundWaves />
 
@@ -60,14 +69,14 @@ export function WelcomeScreen({ onNext }: WelcomeScreenProps = {}) {
           {/* Value Proposition Headline */}
           <div className="mt-7 text-center">
             <h2 className="text-[27px] sm:text-[30px] font-bold leading-tight tracking-tight text-white drop-shadow-sm">
-              Your Trusted <br />
+              Your Personal <br />
               <span className="font-extrabold bg-linear-to-r from-[#D8B4FE] to-[#C084FC] bg-clip-text text-transparent">
-                Financial
+                Finance
               </span>{" "}
-              Partner
+              Demo
             </h2>
             <p className="mt-2 text-sm sm:text-base font-normal text-purple-200/80 tracking-normal">
-              Simple. Secure. Smart.
+              Fictional balances. Simulated actions.
             </p>
           </div>
         </div>
@@ -83,7 +92,7 @@ export function WelcomeScreen({ onNext }: WelcomeScreenProps = {}) {
           <button
             type="button"
             onClick={handleGetStarted}
-            className="group w-full py-4 px-6 bg-white text-primary hover:text-[#30078F] rounded-full font-bold text-base sm:text-lg flex items-center justify-center gap-2.5 shadow-[0_12px_28px_rgba(23,4,79,0.35)] hover:bg-[#FAF9FF] active:scale-[0.98] transition-all duration-200 cursor-pointer"
+            className="group w-full py-4 px-6 bg-white text-primary hover:text-primary-hover rounded-full font-bold text-base sm:text-lg flex items-center justify-center gap-2.5 shadow-[0_12px_28px_rgba(23,4,79,0.35)] hover:bg-[#FAF9FF] active:scale-[0.98] transition-all duration-200 cursor-pointer"
             aria-label="Get Started with Finora"
           >
             <span>Get Started</span>
@@ -102,47 +111,6 @@ export function WelcomeScreen({ onNext }: WelcomeScreenProps = {}) {
             </svg>
           </button>
 
-          {/* Pagination Carousel Dots */}
-          <div
-            className="flex items-center justify-center gap-2 pt-1"
-            role="tablist"
-            aria-label="Onboarding Slides"
-          >
-            <button
-              type="button"
-              onClick={() => setActiveSlide(0)}
-              aria-label="Slide 1"
-              aria-selected={activeSlide === 0}
-              className={`transition-all duration-300 rounded-full cursor-pointer ${
-                activeSlide === 0
-                  ? "w-6 h-2 bg-white shadow-sm shadow-white/40"
-                  : "w-2 h-2 bg-white/35 hover:bg-white/55"
-              }`}
-            />
-            <button
-              type="button"
-              onClick={() => setActiveSlide(1)}
-              aria-label="Slide 2"
-              aria-selected={activeSlide === 1}
-              className={`transition-all duration-300 rounded-full cursor-pointer ${
-                activeSlide === 1
-                  ? "w-6 h-2 bg-white shadow-sm shadow-white/40"
-                  : "w-2 h-2 bg-white/35 hover:bg-white/55"
-              }`}
-            />
-            <button
-              type="button"
-              onClick={() => setActiveSlide(2)}
-              aria-label="Slide 3"
-              aria-selected={activeSlide === 2}
-              className={`transition-all duration-300 rounded-full cursor-pointer ${
-                activeSlide === 2
-                  ? "w-6 h-2 bg-white shadow-sm shadow-white/40"
-                  : "w-2 h-2 bg-white/35 hover:bg-white/55"
-              }`}
-            />
-          </div>
-
           {/* Reset Demo State Trigger (per AGENTS.md demo requirement) */}
           {isStarted && (
             <div className="w-full text-center mt-1">
@@ -155,6 +123,11 @@ export function WelcomeScreen({ onNext }: WelcomeScreenProps = {}) {
                 Reset demo state
               </button>
             </div>
+          )}
+          {resetError && (
+            <p role="status" className="text-center text-xs text-red-200">
+              {resetError}
+            </p>
           )}
         </div>
       </div>

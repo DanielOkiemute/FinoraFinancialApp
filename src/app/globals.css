@@ -2,6 +2,7 @@
 
 :root {
   --primary: #4010D8;
+  --primary-hover: #3409B8;
   --primary-accent: #6D3BF5;
   --app-bg: #F5F3FF;
   --main-text: #17142B;
@@ -12,20 +13,26 @@
 }
 
 @theme inline {
-  --color-primary: #4010D8;
-  --color-primary-accent: #6D3BF5;
-  --color-app-bg: #F5F3FF;
-  --color-main-text: #17142B;
-  --color-success: #16A36A;
-  --color-error: #E5484D;
-  --color-warning: #F2A900;
-  --color-finora-border: #E7E5EF;
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-accent: var(--primary-accent);
+  --color-app-bg: var(--app-bg);
+  --color-main-text: var(--main-text);
+  --color-success: var(--success);
+  --color-error: var(--error);
+  --color-warning: var(--warning);
+  --color-finora-border: var(--border-color);
   --font-sans: var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
+@layer base {
+  body {
+    background-color: #0f0a26;
+    color: var(--main-text);
+  }
+}
+
 body {
-  background-color: #0f0a26;
-  color: var(--main-text);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;

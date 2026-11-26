@@ -18,7 +18,6 @@ export function SecureAuthScreen({
 }: SecureAuthScreenProps) {
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [authMode, setAuthMode] = useState<"signup" | "signin">("signup");
-  const [activeDot, setActiveDot] = useState<number>(0);
 
   const handleOpenSignUp = () => {
     if (onSelectAuth) {
@@ -46,7 +45,7 @@ export function SecureAuthScreen({
   };
 
   return (
-    <div className="relative w-full h-full flex flex-col justify-between overflow-hidden bg-white text-main-text font-sans">
+    <div className="relative w-full min-h-full flex flex-col justify-between bg-white text-main-text font-sans">
       {/* Top Subtle Ambient Glow */}
       <div
         className="absolute top-0 left-0 right-0 h-72 pointer-events-none opacity-60"
@@ -97,49 +96,8 @@ export function SecureAuthScreen({
             Secure & Reliable
           </h2>
           <p className="mt-2 text-sm sm:text-base font-normal text-slate-500 leading-relaxed max-w-62.5 sm:max-w-67.5 mx-auto">
-            Your money is safe with bank-grade security.
+            Finora uses fictional balances and simulated actions. No real money is held or moved.
           </p>
-        </div>
-
-        {/* Carousel Pagination Dots */}
-        <div
-          className="flex items-center justify-center gap-2 pt-1 pb-4"
-          role="tablist"
-          aria-label="Security Onboarding Dots"
-        >
-          <button
-            type="button"
-            onClick={() => setActiveDot(0)}
-            aria-label="Slide 1 active"
-            aria-selected={activeDot === 0}
-            className={`transition-all duration-300 rounded-full cursor-pointer ${
-              activeDot === 0
-                ? "w-2.5 h-2.5 bg-primary"
-                : "w-2.5 h-2.5 bg-[#DDD6FE] hover:bg-[#C4B5FD]"
-            }`}
-          />
-          <button
-            type="button"
-            onClick={() => setActiveDot(1)}
-            aria-label="Slide 2"
-            aria-selected={activeDot === 1}
-            className={`transition-all duration-300 rounded-full cursor-pointer ${
-              activeDot === 1
-                ? "w-2.5 h-2.5 bg-primary"
-                : "w-2.5 h-2.5 bg-[#DDD6FE] hover:bg-[#C4B5FD]"
-            }`}
-          />
-          <button
-            type="button"
-            onClick={() => setActiveDot(2)}
-            aria-label="Slide 3"
-            aria-selected={activeDot === 2}
-            className={`transition-all duration-300 rounded-full cursor-pointer ${
-              activeDot === 2
-                ? "w-2.5 h-2.5 bg-primary"
-                : "w-2.5 h-2.5 bg-[#DDD6FE] hover:bg-[#C4B5FD]"
-            }`}
-          />
         </div>
 
         {/* Bottom Actions: Sign Up (replacing "Next") & Sign In (removing "Skip") */}
@@ -148,7 +106,7 @@ export function SecureAuthScreen({
           <button
             type="button"
             onClick={handleOpenSignUp}
-            className="group w-full py-4 px-6 bg-primary hover:bg-[#3409B8] active:scale-[0.98] text-white rounded-full font-bold text-base sm:text-lg flex items-center justify-center gap-2.5 shadow-[0_12px_24px_rgba(64,16,216,0.3)] transition-all duration-200 cursor-pointer"
+            className="group w-full py-4 px-6 bg-primary hover:bg-primary-hover active:scale-[0.98] text-white rounded-full font-bold text-base sm:text-lg flex items-center justify-center gap-2.5 shadow-[0_12px_24px_rgba(64,16,216,0.3)] transition-all duration-200 cursor-pointer"
             aria-label="Sign Up for Finora"
           >
             <span>Sign Up</span>
@@ -171,7 +129,7 @@ export function SecureAuthScreen({
           <button
             type="button"
             onClick={handleOpenSignIn}
-            className="py-2.5 px-4 text-sm font-semibold text-primary hover:text-[#2E07A0] transition-colors cursor-pointer flex items-center justify-center gap-1"
+            className="py-2.5 px-4 text-sm font-semibold text-primary hover:text-primary-hover transition-colors cursor-pointer flex items-center justify-center gap-1"
             aria-label="Sign In to existing Finora account"
           >
             <span className="text-slate-500 font-normal">Already have an account?</span>

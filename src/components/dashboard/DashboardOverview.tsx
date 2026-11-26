@@ -3,10 +3,11 @@
 import React, { useState } from "react";
 import { StatusBar } from "@/components/ui/StatusBar";
 import { FinoraAppState } from "@/types";
-import { saveAppState } from "@/lib/storage/storage";
+import { loadAppState, saveAppState } from "@/lib/storage/storage";
 import { TransactionsScreen } from "@/components/transactions/TransactionsScreen";
 import { IncomeExpenseScreen } from "@/components/savings/IncomeExpenseScreen";
 import { AnalyticsScreen } from "@/components/analytics/AnalyticsScreen";
+import { formatCurrency } from "@/lib/formatters";
 
 interface DashboardOverviewProps {
   appState: FinoraAppState;
@@ -47,29 +48,36 @@ export function DashboardOverview({
   onStateUpdate,
   onReset,
 }: DashboardOverviewProps) {
-  const [hideBalance, setHideBalance] = useState(appState.preferences.hideBalances);
-  const [activeTab, setActiveTab] = useState<"home" | "transactions" | "savings" | "analytics" | "more">("home");
+  const hideBalance = appState.preferences.hideBalances;
+  const [activeTab, setActiveTab] = useState<"home" | "transactions" | "savings" | "analytics">("home");
   const [showNotificationToast, setShowNotificationToast] = useState(false);
+  const [actionError, setActionError] = useState<string | null>(null);
 
   const toggleHideBalance = () => {
-    const updated: FinoraAppState = {
-      ...appState,
-      preferences: {
-        ...appState.preferences,
-        hideBalances: !hideBalance,
-      },
-    };
-    setHideBalance(!hideBalance);
-    saveAppState(updated);
-    onStateUpdate(updated);
+    try {
+      const latestState = loadAppState();
+      const updated: FinoraAppState = {
+        ...latestState,
+        preferences: {
+          ...latestState.preferences,
+          hideBalances: !hideBalance,
+        },
+      };
+      if (!saveAppState(updated)) {
+        setActionError("Balance visibility could not be saved. Please try again.");
+        return;
+      }
+      onStateUpdate(updated);
+      setActionError(null);
+    } catch (error) {
+      console.error("Failed to update balance visibility:", error);
+      setActionError("Balance visibility could not be saved. Please try again.");
+    }
   };
 
   const displayName = appState.profile.displayName || "Daniel";
 
-  // Format Nigerian Naira balance accurately matching ₦842,750.00
-  const formattedBalance = appState.balance.currency === "NGN"
-    ? `₦${appState.balance.available.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
-    : new Intl.NumberFormat("en-US", { style: "currency", currency: appState.balance.currency }).format(appState.balance.available);
+  const formattedBalance = formatCurrency(appState.balance.available, appState.balance.currency);
 
   // If user tapped 'Transactions' or 'See all', show the dedicated Transactions Screen
   if (activeTab === "transactions") {
@@ -106,7 +114,7 @@ export function DashboardOverview({
   }
 
   return (
-    <div className="relative w-full h-full flex flex-col justify-between overflow-hidden bg-[#F7F6FD] text-main-text font-sans no-scrollbar">
+    <div className="relative w-full min-h-full flex flex-col justify-between overflow-hidden bg-[#F7F6FD] text-main-text font-sans no-scrollbar">
       {/* Top Deep Purple Gradient Background Header */}
       <div className="absolute top-0 left-0 right-0 h-61.25 sm:h-66.25 bg-linear-to-b from-[#2E0796] via-[#3F10D8] to-[#5916E6] pointer-events-none" />
       <div
@@ -159,6 +167,11 @@ export function DashboardOverview({
               Dismiss
             </button>
           </div>
+        )}
+        {actionError && (
+          <p role="status" className="mb-2 rounded-xl bg-red-50 px-3 py-2 text-xs text-red-700">
+            {actionError}
+          </p>
         )}
 
         {/* Total Balance Card */}
@@ -241,7 +254,9 @@ export function DashboardOverview({
           {/* Send Money */}
           <button
             type="button"
-            className="flex flex-col items-center justify-center p-2.5 rounded-[22px] bg-white hover:bg-purple-50/50 active:scale-95 transition-all shadow-sm border border-purple-100/60 min-h-21 cursor-pointer"
+            disabled
+            title="Send Money is unavailable in this demo"
+            className="flex flex-col items-center justify-center p-2.5 rounded-[22px] bg-white transition-all shadow-sm border border-purple-100/60 min-h-21 cursor-not-allowed opacity-60"
           >
             <div className="w-7 h-7 flex items-center justify-center text-primary-accent">
               <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
@@ -252,12 +267,15 @@ export function DashboardOverview({
             <span className="text-[11px] sm:text-xs font-semibold text-main-text mt-1.5 leading-tight text-center">
               Send<br />Money
             </span>
+            <span className="text-[9px] text-slate-400">Unavailable</span>
           </button>
 
           {/* Top Up */}
           <button
             type="button"
-            className="flex flex-col items-center justify-center p-2.5 rounded-[22px] bg-white hover:bg-purple-50/50 active:scale-95 transition-all shadow-sm border border-purple-100/60 min-h-21 cursor-pointer"
+            disabled
+            title="Top Up is unavailable in this demo"
+            className="flex flex-col items-center justify-center p-2.5 rounded-[22px] bg-white transition-all shadow-sm border border-purple-100/60 min-h-21 cursor-not-allowed opacity-60"
           >
             <div className="w-7 h-7 flex items-center justify-center text-primary-accent">
               <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
@@ -268,12 +286,15 @@ export function DashboardOverview({
             <span className="text-[11px] sm:text-xs font-semibold text-main-text mt-1.5 leading-tight text-center">
               Top Up
             </span>
+            <span className="text-[9px] text-slate-400">Unavailable</span>
           </button>
 
           {/* Pay Bills */}
           <button
             type="button"
-            className="flex flex-col items-center justify-center p-2.5 rounded-[22px] bg-white hover:bg-purple-50/50 active:scale-95 transition-all shadow-sm border border-purple-100/60 min-h-21 cursor-pointer"
+            disabled
+            title="Pay Bills is unavailable in this demo"
+            className="flex flex-col items-center justify-center p-2.5 rounded-[22px] bg-white transition-all shadow-sm border border-purple-100/60 min-h-21 cursor-not-allowed opacity-60"
           >
             <div className="w-7 h-7 flex items-center justify-center text-primary-accent">
               <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
@@ -283,12 +304,15 @@ export function DashboardOverview({
             <span className="text-[11px] sm:text-xs font-semibold text-main-text mt-1.5 leading-tight text-center">
               Pay Bills
             </span>
+            <span className="text-[9px] text-slate-400">Unavailable</span>
           </button>
 
           {/* More */}
           <button
             type="button"
-            className="flex flex-col items-center justify-center p-2.5 rounded-[22px] bg-white hover:bg-purple-50/50 active:scale-95 transition-all shadow-sm border border-purple-100/60 min-h-21 cursor-pointer"
+            disabled
+            title="More actions are unavailable in this demo"
+            className="flex flex-col items-center justify-center p-2.5 rounded-[22px] bg-white transition-all shadow-sm border border-purple-100/60 min-h-21 cursor-not-allowed opacity-60"
           >
             <div className="w-7 h-7 flex items-center justify-center">
               <svg className="w-6 h-6" viewBox="0 0 24 24" fill="#6D3BF5">
@@ -301,6 +325,7 @@ export function DashboardOverview({
             <span className="text-[11px] sm:text-xs font-semibold text-main-text mt-1.5 leading-tight text-center">
               More
             </span>
+            <span className="text-[9px] text-slate-400">Unavailable</span>
           </button>
         </div>
 
@@ -321,10 +346,8 @@ export function DashboardOverview({
           <div className="flex flex-col gap-2.5">
             {appState.transactions.slice(0, 2).map((tx) => {
               const isIncome = tx.type === "income";
-              const formattedAmount = `${isIncome ? "+" : "-"}₦${tx.amount.toLocaleString("en-US", {
-                minimumFractionDigits: 0,
-                maximumFractionDigits: 2,
-              })}`;
+              const formattedAmount = `${isIncome ? "+" : "-"}${formatCurrency(tx.amount, tx.currency)}`;
+              const statusLabel = tx.status.charAt(0).toUpperCase() + tx.status.slice(1);
 
               return (
                 <div key={tx.id} className="flex items-center justify-between p-3.5 bg-white rounded-2xl shadow-sm border border-purple-100/60">
@@ -356,6 +379,15 @@ export function DashboardOverview({
                     <p className={`text-sm sm:text-base font-extrabold ${isIncome ? "text-success" : "text-error"}`}>
                       {formattedAmount}
                     </p>
+                    <span className={`mt-1 inline-block rounded-full px-2 py-0.5 text-[10px] font-semibold ${
+                      tx.status === "completed"
+                        ? "bg-emerald-50 text-emerald-700"
+                        : tx.status === "pending"
+                          ? "bg-amber-50 text-amber-700"
+                          : "bg-red-50 text-red-700"
+                    }`}>
+                      {statusLabel}
+                    </span>
                   </div>
                 </div>
               );
@@ -368,7 +400,18 @@ export function DashboardOverview({
           <div className="mt-4 pt-2 text-center">
             <button
               type="button"
-              onClick={onReset}
+              onClick={() => {
+                if (!window.confirm("Reset the demo data stored only in this browser? This clears this browser's saved demo data and returns you to the welcome screen.")) {
+                  return;
+                }
+                try {
+                  onReset();
+                  setActionError(null);
+                } catch (error) {
+                  console.error("Failed to reset demo data:", error);
+                  setActionError("Demo data could not be reset. Your current view is unchanged; please try again.");
+                }
+              }}
               className="text-[11px] text-purple-700/60 hover:text-purple-700 hover:underline cursor-pointer"
             >
               Reset simulated demo data
@@ -437,15 +480,16 @@ export function DashboardOverview({
         {/* More Tab */}
         <button
           type="button"
-          onClick={() => setActiveTab("more")}
-          className="flex flex-col items-center gap-1 transition-all cursor-pointer text-slate-400 hover:text-slate-600"
+          disabled
+          title="More is unavailable in this demo"
+          className="flex flex-col items-center gap-1 transition-all cursor-not-allowed text-slate-300"
         >
           <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
             <circle cx="5" cy="12" r="2" />
             <circle cx="12" cy="12" r="2" />
             <circle cx="19" cy="12" r="2" />
           </svg>
-          <span className="text-[10px] font-medium">More</span>
+          <span className="text-[10px] font-medium">More (unavailable)</span>
         </button>
       </nav>
     </div>
